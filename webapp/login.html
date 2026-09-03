@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sunrise Dental Clinic - Login</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  body { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .login-card { width: 380px; }
+  .login-logo { text-align: center; margin-bottom: 6px; }
+  .login-logo img { height: 80px; width: 80px; }
+  .login-title { text-align: center; color: var(--navy); margin: 4px 0 0; font-size: 20px; }
+  .login-subtitle { text-align: center; color: #666; font-size: 13px; margin: 2px 0 18px; }
+  .hint-box { text-align: center; font-size: 11px; color: #888; margin-top: 14px; font-style: italic; }
+</style>
+</head>
+<body>
+
+<div class="card login-card">
+  <div class="login-logo"><img src="img/logo.png" alt="Sunrise Dental Clinic logo"></div>
+  <h1 class="login-title">Sunrise Dental Clinic</h1>
+  <p class="login-subtitle">Appointment &amp; Patient Management System</p>
+
+  <form id="login-form">
+    <label for="username">Username</label>
+    <input type="text" id="username" autocomplete="username" required>
+
+    <label for="password">Password</label>
+    <input type="password" id="password" autocomplete="current-password" required>
+
+    <div id="status" class="status error"></div>
+
+    <div class="btn-row">
+      <button type="submit" class="btn btn-primary" id="login-btn">Log In</button>
+    </div>
+  </form>
+
+  <div class="hint-box">
+    Default admin account: <b>admin</b> / password123<br>
+    Default receptionist: <b>reception1</b> / password123
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+  // If already logged in, skip straight to the dashboard.
+  if (Session.get()) window.location.href = "dashboard.html";
+
+  document.getElementById("login-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+    const btn = document.getElementById("login-btn");
+
+    if (!username || !password) {
+      showStatus("status", "Username and password are required.", "error");
+      return;
+    }
+
+    btn.disabled = true;
+    showStatus("status", "Signing in...", "info");
+    try {
+      const result = await apiFetch("POST", "/api/login", { username, password });
+      Session.save(result.token, result.user);
+      window.location.href = "dashboard.html";
+    } catch (err) {
+      showStatus("status", err.message, "error");
+      btn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

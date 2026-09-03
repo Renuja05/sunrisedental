@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Reports - Sunrise Dental Clinic</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  @media print {
+    .no-print { display: none !important; }
+    .tab-panel { display: block !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar no-print">
+  <div class="brand">
+    <img src="img/logo.png" alt="logo">
+    <div class="brand-text">
+      <div class="title">Sunrise Dental Clinic</div>
+      <div class="subtitle"><a href="dashboard.html" style="color:#dce6f5;">&larr; Back to Main Menu</a></div>
+    </div>
+  </div>
+  <div id="topbar-who" class="who"></div>
+</div>
+
+<div class="page">
+  <div class="card">
+    <h2 class="mt-0"><img src="img/icon_reports.png" alt=""> Reports</h2>
+
+    <div class="tabs no-print">
+      <button class="tab-btn active" data-tab="daily">Daily Schedule</button>
+      <button class="tab-btn" data-tab="history">Patient History</button>
+      <button class="tab-btn" data-tab="revenue">Revenue Summary</button>
+      <button class="tab-btn" data-tab="workload">Dentist Workload</button>
+    </div>
+
+    <!-- ---------- Daily Schedule ---------- -->
+    <div class="tab-panel active" id="tab-daily">
+      <div class="field-row no-print">
+        <div><label for="daily-date">Date</label><input type="date" id="daily-date"></div>
+        <div style="flex:none;"><label>&nbsp;</label><button class="btn btn-primary" id="daily-run">Run Report</button></div>
+        <div style="flex:none;"><label>&nbsp;</label><button class="btn btn-secondary" id="daily-print">Print</button></div>
+      </div>
+      <div id="daily-status" class="status"></div>
+      <table id="daily-table">
+        <thead><tr><th>Appt No.</th><th>Time</th><th>Patient</th><th>Dentist</th><th>Treatment</th><th>Status</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- ---------- Patient History ---------- -->
+    <div class="tab-panel" id="tab-history">
+      <div class="field-row no-print">
+        <div><label for="history-search">Patient (name or contact)</label><input type="text" id="history-search"></div>
+        <div style="flex:none;"><label>&nbsp;</label><button class="btn btn-secondary" id="history-find">Find Patient</button></div>
+        <div><label for="history-patient">Select patient</label><select id="history-patient"></select></div>
+        <div style="flex:none;"><label>&nbsp;</label><button class="btn btn-primary" id="history-run">Run Report</button></div>
+        <div style="flex:none;"><label>&nbsp;</label><button class="btn btn-secondary" id="history-print">Print</button></div>
+      </div>
+      <div id="history-status" class="status"></div>
+      <table id="history-table">
+        <thead><tr><th>Appt No.</th><th>Date</th><th>Time</th><th>Dentist</th><th>Treatment</th><th>Status</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- ---------- Revenue Summary ---------- -->
+    <div class="tab-panel" id="tab-revenue">
+      <div class="field-row no-print">
+        <div><label for="revenue-from">From</label><input type="date" id="revenue-from"></div>
+        <div><label for="revenue-to">To</label><input type="date" id="revenue-to"></div>
+        <div style="flex:none;"><label>&nbsp;</label><button class="btn btn-primary" id="revenue-run">Run Report</button></div>
+        <div style="flex:none;"><label>&nbsp;</label><button class="btn btn-secondary" id="revenue-print">Print</button></div>
+      </div>
+      <div id="revenue-status" class="status"></div>
+      <table id="revenue-table">
+        <thead><tr><th>Date</th><th>Revenue (Rs.)</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- ---------- Dentist Workload ---------- -->
+    <div class="tab-panel" id="tab-workload">
+      <div class="field-row no-print">
+        <div><label for="workload-from">From</label><input type="date" id="workload-from"></div>
+        <div><label for="workload-to">To</label><input type="date" id="workload-to"></div>
+        <div style="flex:none;"><label>&nbsp;</label><button class="btn btn-primary" id="workload-run">Run Report</button></div>
+        <div style="flex:none;"><label>&nbsp;</label><button class="btn btn-secondary" id="workload-print">Print</button></div>
+      </div>
+      <div id="workload-status" class="status"></div>
+      <table id="workload-table">
+        <thead><tr><th>Dentist</th><th>Total Appointments</th><th>Completed</th><th>Cancelled</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+  const session = Session.requireLogin();
+  if (session) renderUserBar();
+
+  const today = new Date().toISOString().split("T")[0];
+  const firstOfMonth = new Date();
+  firstOfMonth.setDate(1);
+  const firstOfMonthStr = firstOfMonth.toISOString().split("T")[0];
+
+  document.getElementById("daily-date").value = today;
+  document.getElementById("revenue-from").value = firstOfMonthStr;
+  document.getElementById("revenue-to").value = today;
+  document.getElementById("workload-from").value = firstOfMonthStr;
+  document.getElementById("workload-to").value = today;
+
+  // ---- tab switching ----
+  document.querySelectorAll(".tab-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+      document.querySelectorAll(".tab-panel").forEach((p) => p.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+    });
+  });
+
+  function fillTable(tableId, rows, rowMapper) {
+    const tbody = document.querySelector("#" + tableId + " tbody");
+    tbody.innerHTML = "";
+    rows.forEach((row) => {
+      const tr = document.createElement("tr");
+      rowMapper(row).forEach((cell) => {
+        const td = document.createElement("td");
+        td.textContent = cell;
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ---- Daily Schedule ----
+  document.getElementById("daily-run").addEventListener("click", async () => {
+    const date = document.getElementById("daily-date").value;
+    showStatus("daily-status", "Loading...", "info");
+    try {
+      const result = await apiFetch("GET", "/api/reports/daily-schedule?date=" + date);
+      fillTable("daily-table", result.appointments, (a) =>
+          [a.appointmentNumber, a.appointmentTime, a.patientName, a.dentistName, a.treatmentName, a.status]);
+      showStatus("daily-status", result.appointments.length + " appointment(s) found.", "info");
+    } catch (err) {
+      showStatus("daily-status", err.message, "error");
+    }
+  });
+  document.getElementById("daily-print").addEventListener("click", () => window.print());
+
+  // ---- Patient History ----
+  document.getElementById("history-find").addEventListener("click", async () => {
+    const keyword = document.getElementById("history-search").value.trim();
+    if (!keyword) { showStatus("history-status", "Type a name or contact number first.", "error"); return; }
+    try {
+      const result = await apiFetch("GET", "/api/patients?query=" + encodeURIComponent(keyword));
+      const select = document.getElementById("history-patient");
+      select.innerHTML = "";
+      result.patients.forEach((p) => {
+        const opt = document.createElement("option");
+        opt.value = p.patientId;
+        opt.textContent = p.name + " (" + p.contactNumber + ")";
+        select.appendChild(opt);
+      });
+      showStatus("history-status", result.patients.length + " patient(s) found.", "info");
+    } catch (err) {
+      showStatus("history-status", err.message, "error");
+    }
+  });
+
+  document.getElementById("history-run").addEventListener("click", async () => {
+    const select = document.getElementById("history-patient");
+    const patientId = select.value;
+    if (!patientId) { showStatus("history-status", "Search for and select a patient first.", "error"); return; }
+    try {
+      const result = await apiFetch("GET", "/api/reports/patient-history?patientId=" + encodeURIComponent(patientId));
+      fillTable("history-table", result.appointments, (a) =>
+          [a.appointmentNumber, a.appointmentDate, a.appointmentTime, a.dentistName, a.treatmentName, a.status]);
+      showStatus("history-status", result.appointments.length + " past appointment(s).", "info");
+    } catch (err) {
+      showStatus("history-status", err.message, "error");
+    }
+  });
+  document.getElementById("history-print").addEventListener("click", () => window.print());
+
+  // ---- Revenue Summary ----
+  document.getElementById("revenue-run").addEventListener("click", async () => {
+    const from = document.getElementById("revenue-from").value;
+    const to = document.getElementById("revenue-to").value;
+    try {
+      const result = await apiFetch("GET", "/api/reports/revenue?from=" + from + "&to=" + to);
+      fillTable("revenue-table", result.dailyBreakdown, (r) => [r.date, Number(r.revenue).toFixed(2)]);
+      showStatus("revenue-status",
+          result.billCount + " bill(s)  |  Total revenue: Rs. " + Number(result.totalRevenue).toFixed(2), "info");
+    } catch (err) {
+      showStatus("revenue-status", err.message, "error");
+    }
+  });
+  document.getElementById("revenue-print").addEventListener("click", () => window.print());
+
+  // ---- Dentist Workload ----
+  document.getElementById("workload-run").addEventListener("click", async () => {
+    const from = document.getElementById("workload-from").value;
+    const to = document.getElementById("workload-to").value;
+    try {
+      const result = await apiFetch("GET", "/api/reports/dentist-workload?from=" + from + "&to=" + to);
+      fillTable("workload-table", result.workload, (w) =>
+          [w.dentistName, w.totalAppointments, w.completed, w.cancelled]);
+      showStatus("workload-status", result.workload.length + " dentist(s) had appointments in this range.", "info");
+    } catch (err) {
+      showStatus("workload-status", err.message, "error");
+    }
+  });
+  document.getElementById("workload-print").addEventListener("click", () => window.print());
+</script>
+</body>
+</html>

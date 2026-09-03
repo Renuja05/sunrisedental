@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sunrise Dental Clinic - Main Menu</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <img src="img/logo.png" alt="logo">
+    <div class="brand-text">
+      <div class="title">Sunrise Dental Clinic</div>
+      <div class="subtitle" id="dashboard-title">Dashboard</div>
+    </div>
+  </div>
+  <div id="topbar-who" class="who"></div>
+</div>
+
+<div class="page">
+  <div class="card">
+    <h2 class="mt-0">Main Menu</h2>
+    <div class="menu-grid">
+      <a class="menu-btn" href="register-appointment.html">
+        <img src="img/icon_appointment.png" alt=""> 1. Register New Appointment
+      </a>
+      <a class="menu-btn" href="appointment-details.html">
+        <img src="img/icon_search.png" alt=""> 2. Appointment Details / Bill
+      </a>
+      <a class="menu-btn" href="reports.html">
+        <img src="img/icon_reports.png" alt=""> 3. Reports
+      </a>
+      <a class="menu-btn" href="manage-staff.html" data-admin-only>
+        <img src="img/icon_staff.png" alt=""> 4. Manage Staff Accounts
+      </a>
+      <a class="menu-btn" href="help.html">
+        <img src="img/icon_help.png" alt=""> 5. Help
+      </a>
+      <button class="menu-btn btn-danger" id="exit-btn" style="background:#fff;color:#b22222;border:1px solid #b22222;">
+        <img src="img/icon_exit.png" alt=""> 6. Exit System
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+  const session = Session.requireLogin();
+  if (session) {
+    renderUserBar();
+    applyRoleVisibility();
+    document.getElementById("dashboard-title").textContent =
+        session.user.role === "ADMINISTRATOR" ? "Administrator Dashboard" : "Receptionist Dashboard";
+  }
+
+  document.getElementById("exit-btn").addEventListener("click", async () => {
+    if (!confirm("Are you sure you want to exit the system?")) return;
+    try { await apiFetch("POST", "/api/logout"); } catch (e) { /* best-effort */ }
+    Session.clear();
+    window.location.href = "login.html";
+  });
+</script>
+</body>
+</html>

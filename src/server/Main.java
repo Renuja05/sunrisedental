@@ -2,6 +2,7 @@ package server;
 
 import com.sun.net.httpserver.HttpServer;
 import db.DBConnection;
+import web.StaticFileHandler;
 import web.handlers.AppointmentHandler;
 import web.handlers.AuthHandler;
 import web.handlers.BillHandler;

@@ -99,6 +99,19 @@ public class AppointmentDAO {
         }
     }
 
+    /** Every appointment in the system, newest first. Used by the
+     *  "show all appointments" list on the Find an Appointment screen. */
+    public List<Appointment> findAll() throws SQLException {
+        String sql = SELECT_JOINED + "ORDER BY a.appointment_date DESC, a.appointment_time DESC";
+        try (Connection c = db.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            List<Appointment> list = new ArrayList<>();
+            while (rs.next()) list.add(map(rs));
+            return list;
+        }
+    }
+
     public List<Appointment> findByDate(LocalDate date) throws SQLException {
         String sql = SELECT_JOINED + "WHERE a.appointment_date = ? ORDER BY a.appointment_time";
         try (Connection c = db.getConnection();

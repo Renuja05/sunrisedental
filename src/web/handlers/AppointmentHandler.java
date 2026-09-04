@@ -90,10 +90,22 @@ public class AppointmentHandler extends BaseHandler {
             sendJson(exchange, 200, appointment.toMap());
 
         } else if (method.equals("GET") && rest.length == 0) {
-            String dateParam = queryParams(exchange).get("date");
-            LocalDate date = (dateParam == null || dateParam.isBlank()) ? LocalDate.now() : LocalDate.parse(dateParam);
+            Map<String, String> params = queryParams(exchange);
+            String allParam = params.get("all");
+            String dateParam = params.get("date");
+
+            List<Appointment> found;
+            if ("true".equalsIgnoreCase(allParam)) {
+                // "Show all appointments" - every appointment, newest first
+                found = appointmentDAO.findAll();
+            } else {
+                LocalDate date = (dateParam == null || dateParam.isBlank())
+                        ? LocalDate.now() : LocalDate.parse(dateParam);
+                found = appointmentDAO.findByDate(date);
+            }
+
             List<Object> maps = new ArrayList<>();
-            for (Appointment a : appointmentDAO.findByDate(date)) maps.add(a.toMap());
+            for (Appointment a : found) maps.add(a.toMap());
             sendJson(exchange, 200, Map.of("appointments", maps));
 
         } else if (method.equals("PUT") && rest.length == 2 && rest[1].equals("cancel")) {

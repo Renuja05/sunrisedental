@@ -16,14 +16,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
-/**
- * The single entry point for the whole application. Run this file
- * (right-click -> Run File) — it starts one HTTP server that:
- *   1. Serves the REST API under /api/... (see web.handlers.*), and
- *   2. Serves the HTML/CSS/JS frontend out of the webapp/ folder.
- *
- * Then open a browser to http://localhost:8080/
- */
+
 public class Main {
 
     public static final int PORT = 8080;

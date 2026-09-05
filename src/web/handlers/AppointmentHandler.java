@@ -18,13 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Handles:
- *   POST /api/appointments                  -> register a new appointment
- *   GET  /api/appointments/{apptNo}         -> look up one appointment
- *   GET  /api/appointments?date=YYYY-MM-DD  -> the day's schedule
- *   PUT  /api/appointments/{apptNo}/cancel  -> cancel an appointment
- */
+
 public class AppointmentHandler extends BaseHandler {
 
     private static final String PREFIX = "/api/appointments";

@@ -13,11 +13,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
 
-/**
- * Handles:
- *   POST /api/bills           { appointmentNumber, applyDiscount } -> generate a bill
- *   GET  /api/bills/{apptNo}  -> look up an existing bill
- */
+
 public class BillHandler extends BaseHandler {
 
     private static final String PREFIX = "/api/bills";

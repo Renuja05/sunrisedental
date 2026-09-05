@@ -16,13 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Handles:
- *   GET /api/reports/daily-schedule?date=YYYY-MM-DD
- *   GET /api/reports/patient-history?patientId=Pxxxx
- *   GET /api/reports/revenue?from=YYYY-MM-DD&to=YYYY-MM-DD
- *   GET /api/reports/dentist-workload?from=YYYY-MM-DD&to=YYYY-MM-DD
- */
+
 public class ReportHandler extends BaseHandler {
 
     private static final String PREFIX = "/api/reports";

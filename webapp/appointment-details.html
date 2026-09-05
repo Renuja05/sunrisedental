@@ -31,14 +31,29 @@
     <form id="search-form" class="field-row">
       <div>
         <label for="apptNo">Appointment Number</label>
-        <input type="text" id="apptNo" placeholder="e.g. APT2026-0001" required>
+        <input type="text" id="apptNo" placeholder="e.g. APT2026-0001 (leave blank to list all)">
       </div>
       <div style="flex:none;">
         <label>&nbsp;</label>
         <button type="submit" class="btn btn-primary">Search</button>
       </div>
+      <div style="flex:none;">
+        <label>&nbsp;</label>
+        <button type="button" class="btn btn-secondary" id="show-all-btn">Show All Appointments</button>
+      </div>
     </form>
     <div id="search-status" class="status error"></div>
+
+    <!-- List of all appointments; hidden until "Show All" is used -->
+    <div id="all-appointments" style="display:none;">
+      <p class="hint">Click any row to open that appointment's details and billing.</p>
+      <table id="all-table">
+        <thead>
+          <tr><th>Appt No.</th><th>Date</th><th>Time</th><th>Patient</th><th>Dentist</th><th>Treatment</th><th>Status</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </div>
 
   <div class="two-col" id="results" style="display:none;">
@@ -70,7 +85,9 @@
         <div id="bill-status" class="status error"></div>
       </div>
 
-      <div class="receipt" id="receipt" style="margin-top:12px;">No bill generated yet.</div>
+      <div class="invoice" id="receipt" style="margin-top:12px;">
+        <div class="invoice-empty">No bill generated yet.</div>
+      </div>
     </div>
   </div>
 </div>
@@ -82,11 +99,57 @@
 
   let currentAppointment = null;
 
-  document.getElementById("search-form").addEventListener("submit", async (e) => {
+  // ---- Search box: with a number searches that one; blank lists them all ----
+  document.getElementById("search-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const apptNo = document.getElementById("apptNo").value.trim().toUpperCase();
-    if (!apptNo) { showStatus("search-status", "Appointment number is required.", "error"); return; }
+    if (!apptNo) {
+      loadAllAppointments();   // blank box behaves like "Show All"
+    } else {
+      loadAppointment(apptNo);
+    }
+  });
 
+  document.getElementById("show-all-btn").addEventListener("click", loadAllAppointments);
+
+  // ---- Show every appointment in a clickable table ----
+  async function loadAllAppointments() {
+    document.getElementById("results").style.display = "none";
+    showStatus("search-status", "Loading all appointments...", "info");
+
+    try {
+      const result = await apiFetch("GET", "/api/appointments?all=true");
+      const tbody = document.querySelector("#all-table tbody");
+      tbody.innerHTML = "";
+
+      result.appointments.forEach((a) => {
+        const tr = document.createElement("tr");
+        tr.style.cursor = "pointer";
+        [a.appointmentNumber, a.appointmentDate, a.appointmentTime,
+         a.patientName, a.dentistName, a.treatmentName, a.status].forEach((value) => {
+          const td = document.createElement("td");
+          td.textContent = value === null || value === undefined ? "-" : value;
+          tr.appendChild(td);
+        });
+        // Clicking a row opens that appointment's full details below
+        tr.addEventListener("click", () => {
+          document.getElementById("apptNo").value = a.appointmentNumber;
+          loadAppointment(a.appointmentNumber);
+        });
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById("all-appointments").style.display = "block";
+      showStatus("search-status",
+          result.appointments.length + " appointment(s) found.",
+          result.appointments.length ? "info" : "error");
+    } catch (err) {
+      showStatus("search-status", err.message, "error");
+    }
+  }
+
+  // ---- Load one appointment by number ----
+  async function loadAppointment(apptNo) {
     document.getElementById("results").style.display = "none";
     showStatus("search-status", "Searching...", "info");
 
@@ -112,14 +175,14 @@
         setBillingEnabled(false);
         document.getElementById("print-btn").disabled = false;
       } catch (billErr) {
-        document.getElementById("receipt").textContent = "No bill has been generated for this appointment yet.";
+        document.getElementById("receipt").innerHTML = "<div class=\"invoice-empty\">No bill has been generated for this appointment yet.</div>";
         setBillingEnabled(true);
         document.getElementById("print-btn").disabled = true;
       }
     } catch (err) {
       showStatus("search-status", err.message, "error");
     }
-  });
+  }
 
   function setBillingEnabled(enabled) {
     document.getElementById("discount-check").disabled = !enabled;
@@ -151,32 +214,97 @@
   document.getElementById("print-btn").addEventListener("click", () => window.print());
 
   function renderReceipt(bill) {
-    const rs = (n) => "Rs. " + Number(n).toFixed(2);
-    const lines = [
-      "        SUNRISE DENTAL CLINIC",
-      "     Appointment & Billing Receipt",
-      "----------------------------------------",
-      "Bill No.        : " + bill.billNumber,
-      "Appointment No. : " + bill.appointmentNumber,
-      "Patient         : " + (bill.patientName || "-"),
-      "Dentist         : " + (bill.dentistName || "-"),
-      "Treatment       : " + (bill.treatmentName || "-"),
-      "----------------------------------------",
-      pad("Consultation Fee", rs(bill.consultationFee)),
-      pad("Treatment Cost", rs(bill.treatmentCost)),
-      pad("Discount", rs(bill.discount)),
-      "----------------------------------------",
-      pad("TOTAL DUE", rs(bill.totalAmount)),
-      "----------------------------------------",
-      "Thank you for visiting Sunrise Dental Clinic."
-    ];
-    document.getElementById("receipt").textContent = lines.join("\n");
+    const rs = (n) => "Rs. " + Number(n || 0).toFixed(2);
+    const billDate = bill.billDate ? String(bill.billDate).split("T")[0] : new Date().toISOString().split("T")[0];
+
+    // Line items: the consultation fee is charged on every visit, plus the
+    // treatment performed. A discount row is only shown when one applied.
+    let rows = `
+      <tr>
+        <td>Consultation</td>
+        <td>Standard clinic consultation fee</td>
+        <td class="num">1</td>
+        <td class="num">${rs(bill.consultationFee)}</td>
+      </tr>
+      <tr>
+        <td>Treatment</td>
+        <td>${escapeHtml(bill.treatmentName || "-")}</td>
+        <td class="num">1</td>
+        <td class="num">${rs(bill.treatmentCost)}</td>
+      </tr>`;
+
+    if (Number(bill.discount) > 0) {
+      rows += `
+      <tr>
+        <td>Discount</td>
+        <td>Returning-patient discount</td>
+        <td class="num">1</td>
+        <td class="num">- ${rs(bill.discount)}</td>
+      </tr>`;
+    }
+
+    document.getElementById("receipt").innerHTML = `
+      <div class="invoice-head">
+        <div>
+          <img class="inv-logo" src="img/logo.png" alt="">
+          <div class="inv-title">Invoice</div>
+        </div>
+        <div class="clinic">
+          <div class="clinic-name">Sunrise Dental Clinic</div>
+          <div class="clinic-line">No. 12, Galle Road</div>
+          <div class="clinic-line">Colombo 03</div>
+          <div class="clinic-line">Sri Lanka</div>
+        </div>
+      </div>
+
+      <div class="invoice-meta">
+        <div class="bill-to">
+          <div class="label">Bill To</div>
+          <div class="who">${escapeHtml(bill.patientName || "-")}</div>
+          <div>Attending dentist: ${escapeHtml(bill.dentistName || "-")}</div>
+        </div>
+        <div class="meta-right">
+          <div class="meta-row">
+            <div class="label">Bill No.</div>
+            <div class="meta-value">${escapeHtml(bill.billNumber || "-")}</div>
+          </div>
+          <div class="meta-row">
+            <div class="label">Appointment No.</div>
+            <div class="meta-value">${escapeHtml(bill.appointmentNumber || "-")}</div>
+          </div>
+          <div class="meta-row">
+            <div class="label">Date</div>
+            <div class="meta-value">${escapeHtml(billDate)}</div>
+          </div>
+        </div>
+      </div>
+
+      <table class="invoice-items">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Description</th>
+            <th class="num">Qty</th>
+            <th class="num">Amount</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+
+      <div class="invoice-foot">
+        <div class="notes">
+          <div class="label">Notes</div>
+          Thank you for visiting Sunrise Dental Clinic.<br>
+          Please retain this receipt for your records and bring your
+          appointment number to any follow-up visit.
+        </div>
+        <div class="total">
+          <div class="label">Total</div>
+          <div class="amount">${rs(bill.totalAmount)}</div>
+        </div>
+      </div>`;
   }
 
-  function pad(label, value) {
-    const width = 22;
-    return label + " ".repeat(Math.max(1, width - label.length)) + value;
-  }
 </script>
 </body>
 </html>

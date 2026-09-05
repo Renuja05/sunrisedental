@@ -16,13 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Handles:
- *   GET  /api/dentists    -> { dentists: [...] }
- *   POST /api/dentists    (Administrator only) { name, specialization }
- *   GET  /api/treatments  -> { treatments: [...] }
- *   POST /api/treatments  (Administrator only) { treatmentName, cost }
- */
+
 public class ReferenceDataHandler extends BaseHandler {
 
     private final DentistDAO dentistDAO = new DentistDAO();

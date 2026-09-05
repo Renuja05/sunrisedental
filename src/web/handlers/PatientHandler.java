@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/** Handles: GET /api/patients?query=keyword -> { patients: [...] } */
+
 public class PatientHandler extends BaseHandler {
 
     private final PatientDAO patientDAO = new PatientDAO();

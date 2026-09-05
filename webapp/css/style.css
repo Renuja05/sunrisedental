@@ -202,3 +202,165 @@ tr:hover td { background: #fafbfd; }
 .hint { color: #777; font-size: 12px; margin-top: 6px; }
 .center { text-align: center; }
 .mt-0 { margin-top: 0; }
+
+/* ================= Invoice-style bill ================= */
+
+.invoice {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  font-size: 13px;
+}
+
+.invoice-empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: #888;
+  font-style: italic;
+}
+
+/* --- Header band --- */
+.invoice-head {
+  background: var(--navy);
+  color: #fff;
+  padding: 22px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.invoice-head .inv-title {
+  font-size: 30px;
+  font-weight: 300;
+  letter-spacing: 1px;
+  margin-top: 26px;
+}
+
+.invoice-head .inv-logo { height: 40px; width: 40px; }
+
+.invoice-head .clinic {
+  text-align: right;
+  line-height: 1.6;
+}
+
+.invoice-head .clinic .clinic-name {
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.invoice-head .clinic .clinic-line {
+  font-size: 11px;
+  color: var(--light-blue);
+}
+
+/* --- Bill-to / meta block --- */
+.invoice-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.invoice-meta .label {
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  color: #888;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+
+.invoice-meta .bill-to .who {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 3px;
+}
+
+.invoice-meta .bill-to div { line-height: 1.5; }
+
+.invoice-meta .meta-right { text-align: right; }
+.invoice-meta .meta-right .meta-row { margin-bottom: 8px; }
+.invoice-meta .meta-right .meta-value { font-weight: 600; }
+
+/* --- Line items --- */
+table.invoice-items {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+}
+
+table.invoice-items th {
+  background: none;
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #888;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  padding: 12px 24px;
+}
+
+table.invoice-items td {
+  padding: 14px 24px;
+  border-bottom: 1px solid #eef1f5;
+}
+
+table.invoice-items .num { text-align: right; }
+
+/* --- Footer / total --- */
+.invoice-foot { display: flex; }
+
+.invoice-foot .notes {
+  flex: 1;
+  background: var(--light-blue);
+  padding: 20px 24px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #33455f;
+}
+
+.invoice-foot .notes .label {
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.invoice-foot .total {
+  background: var(--navy);
+  color: #fff;
+  padding: 20px 28px;
+  text-align: right;
+  min-width: 210px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.invoice-foot .total .label {
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--light-blue);
+  margin-bottom: 4px;
+}
+
+.invoice-foot .total .amount {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+/* Keep the colour bands when printing */
+@media print {
+  .invoice, .invoice-head, .invoice-foot .total, .invoice-foot .notes {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .invoice { border: none; }
+}

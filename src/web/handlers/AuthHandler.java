@@ -14,11 +14,7 @@ import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * Handles:
- *   POST /api/login  { username, password } -> { token, user }
- *   POST /api/logout                          (X-Auth-Token header)
- */
+
 public class AuthHandler extends BaseHandler {
 
     private final UserDAO userDAO = new UserDAO();

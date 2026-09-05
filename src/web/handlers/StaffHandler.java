@@ -14,15 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Staff-account administration — every operation here requires an
- * Administrator session.
- *
- *   GET  /api/staff                     -> list all accounts
- *   POST /api/staff                     { username, password, fullName, role } -> create account
- *   PUT  /api/staff/{userId}/active     { active: true|false }
- *   PUT  /api/staff/{userId}/password   { password }
- */
+
 public class StaffHandler extends BaseHandler {
 
     private static final String PREFIX = "/api/staff";

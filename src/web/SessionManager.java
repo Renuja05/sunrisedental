@@ -5,7 +5,7 @@ import model.User;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/
+
 public final class SessionManager {
 
     private static final SessionManager INSTANCE = new SessionManager();

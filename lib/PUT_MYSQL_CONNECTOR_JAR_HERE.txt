@@ -1,3 +1,0 @@
-Place mysql-connector-j-<version>.jar in this folder, then add it to
-your project's Libraries in NetBeans (Properties -> Libraries -> Add
-JAR/Folder). See README.md for full setup steps.

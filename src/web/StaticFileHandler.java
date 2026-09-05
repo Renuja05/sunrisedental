@@ -8,13 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
 
-/**
- * Serves the plain HTML/CSS/JS/image files that make up the browser
- * side of the application, out of the {@code webapp/} folder. This is
- * the "Java backend also hosts the frontend" half of the architecture —
- * everything under {@code /api/...} is handled by {@link BaseHandler}
- * subclasses instead; this class only ever serves static files.
- */
+
 public class StaticFileHandler implements HttpHandler {
 
     private final File webRoot;

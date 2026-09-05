@@ -13,7 +13,7 @@ import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 
-/** DAO for {@link Bill} records. */
+
 public class BillDAO {
 
     private final DBConnection db = DBConnection.getInstance();
@@ -37,12 +37,7 @@ public class BillDAO {
         }
     }
 
-    /**
-     * Calculates and stores the bill for one appointment: total =
-     * consultation fee + treatment cost − discount. Also marks the
-     * appointment as COMPLETED. Returns {@code null} if a bill already
-     * exists for this appointment (each appointment is only billed once).
-     */
+    
     public Bill generateBill(String appointmentNumber, double consultationFee,
                               double treatmentCost, double discount) throws SQLException {
         if (findByAppointmentNumber(appointmentNumber) != null) {

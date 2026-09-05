@@ -5,13 +5,7 @@ import java.time.LocalTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * A single booked visit. Only the foreign-key ids (patientId, dentistId,
- * treatmentId) are stored in the appointments table; the "...Name"
- * fields below are convenience values filled in by AppointmentDAO's
- * join queries so the caller doesn't need extra lookups to display a
- * readable record.
- */
+
 public class Appointment {
 
     public static final String STATUS_SCHEDULED = "SCHEDULED";

@@ -3,7 +3,7 @@ package model;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** A treatment type and its standard cost. */
+
 public class Treatment {
 
     private String treatmentId;

@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** The receipt generated for one appointment. */
+
 public class Bill {
 
     private String billNumber;
@@ -15,7 +15,7 @@ public class Bill {
     private double totalAmount;
     private LocalDateTime billDate;
 
-    // Display-only convenience fields
+    
     private String patientName;
     private String dentistName;
     private String treatmentName;

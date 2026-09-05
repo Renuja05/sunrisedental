@@ -5,12 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/**
- * Generates the next sequential id for a given prefix by looking at the
- * highest existing id in the table that starts with that prefix — so
- * appointment numbers, bill numbers, patient ids etc. are produced
- * automatically by the system instead of being typed in by staff.
- */
+
 public final class IdGenerator {
 
     private IdGenerator() { }

@@ -3,7 +3,7 @@ package model;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** A dentist who can be assigned to appointments. */
+
 public class Dentist {
 
     private String dentistId;

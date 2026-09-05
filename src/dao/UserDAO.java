@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/** DAO for {@link User} accounts (login and staff management). */
+
 public class UserDAO {
 
     private final DBConnection db = DBConnection.getInstance();
@@ -79,8 +79,7 @@ public class UserDAO {
         }
     }
 
-    /** Builds the correct subclass (Administrator or Receptionist) from
-     *  the "role" column, so callers get real polymorphic User objects. */
+    
     private User map(ResultSet rs) throws SQLException {
         String role = rs.getString("role");
         String id = rs.getString("user_id");

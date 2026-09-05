@@ -4,21 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * A small, dependency-free JSON reader/writer for the web service. The
- * project intentionally avoids third-party libraries (Gson, Jackson,
- * org.json...) so the backend compiles with nothing but a standard JDK.
- *
- *   JSON object -> java.util.LinkedHashMap&lt;String, Object&gt;
- *   JSON array  -> java.util.List&lt;Object&gt;
- *   JSON string -> java.lang.String
- *   JSON number -> java.lang.Double
- *   JSON true/false -> java.lang.Boolean
- *   JSON null   -> null
- *
- * The browser side needs no equivalent code — every modern browser has
- * JSON.parse()/JSON.stringify() built in.
- */
+
 public final class Json {
 
     private Json() { }

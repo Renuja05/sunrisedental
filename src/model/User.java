@@ -3,13 +3,7 @@ package model;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * Base class for every system account. Concrete roles ({@link Receptionist},
- * {@link Administrator}) extend this class — this inheritance is what
- * lets a handler show the right dashboard title and decide whether
- * "Manage Staff Accounts" is allowed, without an if/else on role
- * strings anywhere else in the code.
- */
+
 public abstract class User {
 
     private String userId;

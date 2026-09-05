@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/** DAO for {@link Dentist} records. */
+
 public class DentistDAO {
 
     private final DBConnection db = DBConnection.getInstance();

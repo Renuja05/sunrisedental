@@ -14,13 +14,12 @@ import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 
-/** DAO for {@link Appointment} records — the core entity of the system. */
+/
 public class AppointmentDAO {
 
     private final DBConnection db = DBConnection.getInstance();
 
-    /** Every read query joins the three reference tables so the caller
-     *  gets human-readable names without a second lookup. */
+    
     private static final String SELECT_JOINED =
             "SELECT a.*, p.name AS patient_name, p.contact_number AS patient_contact, " +
             "       p.address AS patient_address, " +
@@ -57,13 +56,7 @@ public class AppointmentDAO {
         }
     }
 
-    /**
-     * Inserts a new appointment. Returns the saved appointment (with its
-     * generated number) on success, or {@code null} if the dentist is
-     * already booked for that exact date/time — this is the check that
-     * stops the double bookings described in the scenario, done here
-     * (instead of a separate Service class) right before the INSERT.
-     */
+   
     public Appointment register(String patientId, String dentistId, String treatmentId,
                                  LocalDate date, LocalTime time) throws SQLException {
         if (isSlotTaken(dentistId, date, time)) {
@@ -99,8 +92,7 @@ public class AppointmentDAO {
         }
     }
 
-    /** Every appointment in the system, newest first. Used by the
-     *  "show all appointments" list on the Find an Appointment screen. */
+    
     public List<Appointment> findAll() throws SQLException {
         String sql = SELECT_JOINED + "ORDER BY a.appointment_date DESC, a.appointment_time DESC";
         try (Connection c = db.getConnection();

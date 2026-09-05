@@ -1,6 +1,6 @@
 package model;
 
-/** Day-to-day clinic staff account: appointments, search, billing. */
+
 public class Receptionist extends User {
 
     public Receptionist(String userId, String username, String passwordHash,

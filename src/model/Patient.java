@@ -3,7 +3,7 @@ package model;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** A registered patient of the clinic. */
+
 public class Patient {
 
     private String patientId;

@@ -4,12 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.regex.Pattern;
 
-/**
- * Central place for every input-validation rule in the system, so the
- * same rule is never written twice across different forms. Each method
- * returns a human-readable error message describing what is wrong, or
- * {@code null} when the value is valid.
- */
+
 public final class Validator {
 
     private Validator() { }

@@ -1,6 +1,6 @@
 package model;
 
-/** Elevated account: everything a Receptionist can do, plus staff management. */
+
 public class Administrator extends User {
 
     public Administrator(String userId, String username, String passwordHash,

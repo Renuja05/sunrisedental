@@ -13,13 +13,7 @@ import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * Shared plumbing for every REST endpoint: reading a JSON request body,
- * writing a JSON response, reading query parameters, and checking the
- * X-Auth-Token header. Any SQLException or unexpected error is turned
- * into a clean JSON error response instead of a stack trace reaching
- * the browser.
- */
+
 public abstract class BaseHandler implements HttpHandler {
 
     @Override
@@ -71,8 +65,7 @@ public abstract class BaseHandler implements HttpHandler {
         return params;
     }
 
-    /** Path segments after the given prefix, e.g. for prefix "/api/appointments"
-     *  and path "/api/appointments/APT2026-0001" this returns ["APT2026-0001"]. */
+    
     protected String[] remainingPath(HttpExchange exchange, String prefix) {
         String path = exchange.getRequestURI().getPath();
         String rest = path.length() > prefix.length() ? path.substring(prefix.length()) : "";
@@ -81,7 +74,7 @@ public abstract class BaseHandler implements HttpHandler {
         return rest.split("/");
     }
 
-    /** Returns the logged-in user for this request, or null if there isn't one. */
+    
     protected User currentUser(HttpExchange exchange) {
         String token = exchange.getRequestHeaders().getFirst("X-Auth-Token");
         return SessionManager.getInstance().getUser(token);

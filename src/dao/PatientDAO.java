@@ -11,12 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * DAO (Data Access Object Design Pattern) for {@link Patient}.
- * Every SQL statement for patients lives in this one class — the view
- * (JFrame) layer never writes SQL itself, it only ever calls these
- * methods and works with plain Patient objects.
- */
+
 public class PatientDAO {
 
     private final DBConnection db = DBConnection.getInstance();
@@ -69,7 +64,7 @@ public class PatientDAO {
         }
     }
 
-    /** Inserts a brand-new patient row and fills in the generated id. */
+    
     public Patient insert(Patient patient) throws SQLException {
         try (Connection c = db.getConnection()) {
             String id = IdGenerator.next(c, "patients", "patient_id", "P", 4);

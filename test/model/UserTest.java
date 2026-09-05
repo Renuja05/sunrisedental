@@ -1,25 +1,23 @@
 package model;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Unit tests for the {@link User} role hierarchy.
+ * Unit tests for the {@link User} role hierarchy (JUnit 4).
  *
  * The access-control rule from Task A ("only an Administrator may
  * manage staff accounts") is implemented as polymorphism rather than
  * as if/else checks scattered through the code, so it is tested here
  * at its source.
  */
-@DisplayName("User role hierarchy")
-class UserTest {
+public class UserTest {
 
     private Administrator admin() {
         return new Administrator("U0001", "admin", "hash", "System Administrator", true);
@@ -30,79 +28,69 @@ class UserTest {
     }
 
     @Test
-    @DisplayName("an Administrator may manage staff accounts")
-    void administratorCanManageStaff() {
+    public void administratorCanManageStaff() {
         assertTrue(admin().canManageStaff());
     }
 
     @Test
-    @DisplayName("a Receptionist may NOT manage staff accounts")
-    void receptionistCannotManageStaff() {
+    public void receptionistCannotManageStaff() {
         assertFalse(receptionist().canManageStaff());
     }
 
     @Test
-    @DisplayName("each role reports the discriminator stored in the database")
-    void rolesMatchDatabaseValues() {
+    public void rolesMatchDatabaseValues() {
         assertEquals("ADMINISTRATOR", admin().getRole());
         assertEquals("RECEPTIONIST", receptionist().getRole());
     }
 
     @Test
-    @DisplayName("each role has its own dashboard title")
-    void rolesHaveOwnDashboardTitles() {
+    public void rolesHaveOwnDashboardTitles() {
         assertEquals("Administrator Dashboard", admin().getDashboardTitle());
         assertEquals("Receptionist Dashboard", receptionist().getDashboardTitle());
     }
 
     @Test
-    @DisplayName("polymorphism works: a User reference gives the subclass behaviour")
-    void polymorphismResolvesToSubclass() {
+    public void polymorphismResolvesToSubclass() {
         User asUser = admin();
-        assertTrue(asUser.canManageStaff(),
-                "Calling through a User reference must still use Administrator's behaviour.");
+        assertTrue("Calling through a User reference must still use Administrator's behaviour.",
+                asUser.canManageStaff());
     }
 
     @Test
-    @DisplayName("toMap() never exposes the password hash to the client")
-    void toMapOmitsPasswordHash() {
+    public void toMapOmitsPasswordHash() {
         Map<String, Object> map = admin().toMap();
-        assertFalse(map.containsKey("passwordHash"),
-                "The password hash must never be serialised into an API response.");
-        assertFalse(map.toString().contains("hash"),
-                "No part of the stored hash should appear in the client-facing map.");
+        assertFalse("The password hash must never be serialised into an API response.",
+                map.containsKey("passwordHash"));
+        assertFalse("No part of the stored hash should appear in the client-facing map.",
+                map.toString().contains("hash"));
     }
 
     @Test
-    @DisplayName("toMap() includes the fields the browser actually needs")
-    void toMapIncludesClientFields() {
+    public void toMapIncludesClientFields() {
         Map<String, Object> map = receptionist().toMap();
         assertEquals("U0002", map.get("userId"));
         assertEquals("reception1", map.get("username"));
         assertEquals("Nimali Perera", map.get("fullName"));
         assertEquals("RECEPTIONIST", map.get("role"));
-        assertEquals(true, map.get("active"));
+        assertEquals(Boolean.TRUE, map.get("active"));
     }
 
     @Test
-    @DisplayName("a deactivated account is flagged as inactive")
-    void inactiveAccountIsFlagged() {
+    public void inactiveAccountIsFlagged() {
         Receptionist inactive = new Receptionist("U0003", "olduser", "hash", "Old User", false);
         assertFalse(inactive.isActive());
-        assertEquals(false, inactive.toMap().get("active"));
+        assertEquals(Boolean.FALSE, inactive.toMap().get("active"));
     }
 
     @Test
-    @DisplayName("Appointment status constants match the values allowed by the database CHECK constraint")
-    void appointmentStatusConstantsMatchSchema() {
+    public void appointmentStatusConstantsMatchSchema() {
         assertEquals("SCHEDULED", Appointment.STATUS_SCHEDULED);
         assertEquals("COMPLETED", Appointment.STATUS_COMPLETED);
         assertEquals("CANCELLED", Appointment.STATUS_CANCELLED);
     }
 
     @Test
-    @DisplayName("Appointment.toMap() serialises dates and times as ISO strings")
-    void appointmentToMapFormatsDateTime() {
+    public void appointmentToMapFormatsDateAndTimeAsIsoStrings() {
         Appointment appointment = new Appointment(
                 "APT2026-0001", "P0001", "D0001", "T0001",
                 java.time.LocalDate.of(2026, 5, 20),
